@@ -1,0 +1,1292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lucky Block Clicker</title>
+    <style>
+        body {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            height: 100%;
+            overflow-x: hidden;
+            transition: all 0.3s ease;
+        }
+
+        html {
+            height: 100%;
+        }
+
+        .theme-gold {
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            color: #8b4513;
+        }
+
+        .theme-blue {
+            background: linear-gradient(135deg, #4a90e2, #7bb3f0);
+            color: #1a365d;
+        }
+
+        .theme-red {
+            background: linear-gradient(135deg, #e53e3e, #fc8181);
+            color: #742a2a;
+        }
+
+        .theme-dark {
+            background: linear-gradient(135deg, #2d3748, #4a5568);
+            color: #e2e8f0;
+        }
+
+        .theme-white {
+            background: linear-gradient(135deg, #f7fafc, #edf2f7);
+            color: #2d3748;
+        }
+
+        .container {
+            min-height: 100%;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .stats {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: rgba(255,255,255,0.2);
+            padding: 15px 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.3);
+            text-align: center;
+            min-width: 120px;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .game-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .click-button {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: none;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+
+        .click-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.4);
+        }
+
+        .click-button:active {
+            transform: scale(0.95);
+        }
+
+        .progress-bar {
+            width: 300px;
+            height: 20px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4ecdc4, #44a08d);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        .lucky-blocks {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            max-width: 600px;
+        }
+
+        .lucky-block {
+            width: 80px;
+            height: 80px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            font-size: 2rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .lucky-block.common {
+            background: linear-gradient(45deg, #95a5a6, #bdc3c7);
+        }
+
+        .lucky-block.rare {
+            background: linear-gradient(45deg, #3498db, #5dade2);
+            animation: glow-blue 2s infinite alternate;
+        }
+
+        .lucky-block.epic {
+            background: linear-gradient(45deg, #9b59b6, #bb6bd9);
+            animation: glow-purple 2s infinite alternate;
+        }
+
+        .lucky-block.legendary {
+            background: linear-gradient(45deg, #f39c12, #f5b041);
+            animation: glow-gold 2s infinite alternate;
+        }
+
+        .lucky-block.mythic {
+            background: linear-gradient(45deg, #ffd700, #ffed4e, #ffd700);
+            animation: glow-mythic 1.5s infinite alternate;
+        }
+
+        .lucky-block.godly {
+            background: linear-gradient(45deg, #ff0080, #00ff80, #8000ff, #ff8000, #0080ff);
+            background-size: 300% 300%;
+            animation: rainbow 2s linear infinite, glow-godly 1.5s infinite alternate;
+        }
+
+        .lucky-block.glorious {
+            background: linear-gradient(45deg, #000000, #ffffff, #000000, #ffffff);
+            background-size: 200% 200%;
+            animation: glorious 1s linear infinite, glow-glorious 1.5s infinite alternate;
+        }
+
+        @keyframes glow-blue {
+            0% { box-shadow: 0 0 10px #3498db; }
+            100% { box-shadow: 0 0 20px #3498db, 0 0 30px #3498db; }
+        }
+
+        @keyframes glow-purple {
+            0% { box-shadow: 0 0 10px #9b59b6; }
+            100% { box-shadow: 0 0 20px #9b59b6, 0 0 30px #9b59b6; }
+        }
+
+        @keyframes glow-gold {
+            0% { box-shadow: 0 0 10px #f39c12; }
+            100% { box-shadow: 0 0 20px #f39c12, 0 0 30px #f39c12; }
+        }
+
+        @keyframes glow-mythic {
+            0% { box-shadow: 0 0 15px #ffd700; }
+            100% { box-shadow: 0 0 30px #ffd700, 0 0 45px #ffd700; }
+        }
+
+        @keyframes glow-godly {
+            0% { box-shadow: 0 0 20px #ff0080; }
+            100% { box-shadow: 0 0 40px #ff0080, 0 0 60px #00ff80; }
+        }
+
+        @keyframes glow-glorious {
+            0% { box-shadow: 0 0 25px #ffffff; }
+            100% { box-shadow: 0 0 50px #ffffff, 0 0 75px #000000; }
+        }
+
+        @keyframes rainbow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes glorious {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+
+        .lucky-block:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn.rebirth {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            color: white;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: rgba(255,255,255,0.95);
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .theme-selector {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .theme-btn {
+            width: 60px;
+            height: 60px;
+            border: 3px solid transparent;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .theme-btn.active {
+            border-color: #333;
+            transform: scale(1.1);
+        }
+
+        .theme-btn.gold { background: linear-gradient(135deg, #ffd700, #ffed4e); }
+        .theme-btn.blue { background: linear-gradient(135deg, #4a90e2, #7bb3f0); }
+        .theme-btn.red { background: linear-gradient(135deg, #e53e3e, #fc8181); }
+        .theme-btn.dark { background: linear-gradient(135deg, #2d3748, #4a5568); }
+        .theme-btn.white { background: linear-gradient(135deg, #f7fafc, #edf2f7); }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            z-index: 1001;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.money {
+            background: linear-gradient(45deg, #27ae60, #2ecc71);
+        }
+
+        .notification.block {
+            background: linear-gradient(45deg, #f39c12, #f5b041);
+        }
+
+        .notification.rebirth {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+        }
+
+        .shop-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+            max-width: 800px;
+        }
+
+        .shop-item {
+            background: rgba(255,255,255,0.1);
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .shop-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .shop-item.purchased {
+            opacity: 0.6;
+            background: rgba(0,255,0,0.1);
+        }
+
+        .shop-item h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.2rem;
+        }
+
+        .shop-item p {
+            margin: 10px 0;
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+
+        .shop-price {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #f39c12;
+            margin: 10px 0;
+        }
+
+        .admin-panel {
+            background: rgba(0,0,0,0.9);
+            border: 2px solid #ff0000;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            color: #ff0000;
+            font-family: 'Courier New', monospace;
+        }
+
+        .admin-panel h2 {
+            color: #ff0000;
+            text-align: center;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px #ff0000;
+        }
+
+        .admin-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .admin-btn {
+            background: rgba(255,0,0,0.2);
+            border: 1px solid #ff0000;
+            color: #ff0000;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .admin-btn:hover {
+            background: rgba(255,0,0,0.4);
+            box-shadow: 0 0 10px #ff0000;
+        }
+
+        .admin-input {
+            background: rgba(255,0,0,0.1);
+            border: 1px solid #ff0000;
+            color: #ff0000;
+            padding: 8px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            width: 100%;
+            margin: 5px 0;
+        }
+
+        .admin-input::placeholder {
+            color: rgba(255,0,0,0.6);
+        }
+
+        .admin-section {
+            margin: 15px 0;
+            padding: 10px;
+            border: 1px solid rgba(255,0,0,0.3);
+            border-radius: 5px;
+        }
+
+        .admin-section h3 {
+            margin: 0 0 10px 0;
+            color: #ff0000;
+            font-size: 1rem;
+        }
+
+        .event-notification {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            color: white;
+            padding: 30px;
+            border-radius: 20px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-align: center;
+            z-index: 1002;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            animation: eventPulse 0.5s ease-out;
+        }
+
+        @keyframes eventPulse {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            .stats {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .click-button {
+                width: 120px;
+                height: 120px;
+            }
+        }
+    </style>
+</head>
+<body class="theme-gold">
+    <div class="container">
+        <div class="header">
+            <h1 class="title"><span id="adminDice" onclick="toggleAdmin()" style="cursor: pointer;">🎲</span> Lucky Block Clicker</h1>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value" id="money">$0</div>
+                <div class="stat-label">Money</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="moneyPerSecond">$0/s</div>
+                <div class="stat-label">Per Second</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="rebirths">0</div>
+                <div class="stat-label">Rebirths</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="multiplier">1x</div>
+                <div class="stat-label">Multiplier</div>
+            </div>
+        </div>
+
+        <div class="game-area">
+            <button class="click-button" id="clickButton" onclick="handleClick()">
+                CLICK ME!
+            </button>
+
+            <div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div style="text-align: center; margin-top: 5px;">
+                    <span id="clickProgress">0</span> / <span id="clicksNeeded">5</span> clicks for lucky block
+                </div>
+            </div>
+
+            <div class="lucky-blocks" id="luckyBlocks"></div>
+        </div>
+
+        <div class="controls">
+            <button class="btn" onclick="openSettings()">⚙️ Settings</button>
+            <button class="btn" onclick="openShop()">🛒 Shop</button>
+            <button class="btn rebirth" id="rebirthBtn" onclick="rebirth()">🔄 Rebirth ($1000)</button>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <h2>Settings</h2>
+            <h3>Choose Theme:</h3>
+            <div class="theme-selector">
+                <div class="theme-btn gold active" onclick="changeTheme('gold')"></div>
+                <div class="theme-btn blue" onclick="changeTheme('blue')"></div>
+                <div class="theme-btn red" onclick="changeTheme('red')"></div>
+                <div class="theme-btn dark" onclick="changeTheme('dark')"></div>
+                <div class="theme-btn white" onclick="changeTheme('white')"></div>
+            </div>
+            <button class="btn" onclick="closeSettings()">Close</button>
+        </div>
+    </div>
+
+    <!-- Shop Modal -->
+    <div class="modal" id="shopModal">
+        <div class="modal-content" style="max-width: 900px;">
+            <h2>🛒 Upgrade Shop</h2>
+            <div class="shop-grid" id="shopGrid"></div>
+            <button class="btn" onclick="closeShop()">Close</button>
+        </div>
+    </div>
+
+    <!-- Admin Panel -->
+    <div id="adminPanel" style="display: none;">
+        <div class="admin-panel">
+            <h2>🔴 ADMIN PANEL 🔴</h2>
+            
+            <div class="admin-section">
+                <h3>💰 Money Controls</h3>
+                <input type="number" class="admin-input" id="customMoneyInput" placeholder="Enter amount..." min="0">
+                <button class="admin-btn" onclick="adminAddCustomMoney()">Add Custom Amount</button>
+                <button class="admin-btn" onclick="adminAddMoney()">Add $10,000</button>
+                <button class="admin-btn" onclick="adminSetMoney()">Set Money to Input</button>
+            </div>
+
+            <div class="admin-section">
+                <h3>🎲 Block Controls</h3>
+                <select class="admin-input" id="blockRaritySelect">
+                    <option value="common">Common 📦</option>
+                    <option value="rare">Rare 💎</option>
+                    <option value="epic">Epic 🔮</option>
+                    <option value="legendary">Legendary 👑</option>
+                    <option value="mythic">Mythic ⭐</option>
+                    <option value="godly">Godly 🌈</option>
+                    <option value="glorious">Glorious ⚡</option>
+                </select>
+                <input type="number" class="admin-input" id="blockAmountInput" placeholder="Amount (1-50)" min="1" max="50" value="1">
+                <button class="admin-btn" onclick="adminAddCustomBlocks()">Spawn Custom Blocks</button>
+            </div>
+
+            <div class="admin-section">
+                <h3>⚡ Random Events</h3>
+                <select class="admin-input" id="eventSelect">
+                    <option value="goldRush">💰 Gold Rush (5x money for 30s)</option>
+                    <option value="luckyStreak">🍀 Lucky Streak (10x luck for 60s)</option>
+                    <option value="blockRain">🌧️ Block Rain (spawn 20 random blocks)</option>
+                    <option value="megaMultiplier">⚡ Mega Multiplier (10x click value for 45s)</option>
+                    <option value="instantRebirth">🔄 Free Rebirth (no cost rebirth)</option>
+                    <option value="shopSale">🛒 Shop Sale (50% off all upgrades for 2min)</option>
+                </select>
+                <button class="admin-btn" onclick="adminTriggerEvent()">Trigger Event</button>
+            </div>
+
+            <div class="admin-section">
+                <h3>🔧 Game Controls</h3>
+                <button class="admin-btn" onclick="adminMaxUpgrades()">Buy All Upgrades</button>
+                <button class="admin-btn" onclick="adminUnlockAll()">Unlock All Rarities</button>
+                <button class="admin-btn" onclick="adminResetGame()">Reset Game</button>
+                <button class="admin-btn" onclick="closeAdmin()">Close Panel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification"></div>
+
+    <!-- Event Notification -->
+    <div class="event-notification" id="eventNotification" style="display: none;"></div>
+
+    <script>
+        // Game state
+        let gameState = {
+            money: 0,
+            clicks: 0,
+            clicksNeeded: 5,
+            rebirths: 0,
+            multiplier: 1,
+            luckyBlocks: [],
+            moneyPerSecond: 0,
+            theme: 'gold',
+            upgrades: {},
+            activeEvents: {}
+        };
+
+        // Random events system
+        const randomEvents = {
+            goldRush: {
+                name: "💰 GOLD RUSH!",
+                description: "All money income is multiplied by 5x!",
+                duration: 30000,
+                effect: () => { gameState.activeEvents.goldRushMultiplier = 5; },
+                cleanup: () => { delete gameState.activeEvents.goldRushMultiplier; }
+            },
+            luckyStreak: {
+                name: "🍀 LUCKY STREAK!",
+                description: "Your luck is increased by 1000% for better blocks!",
+                duration: 60000,
+                effect: () => { gameState.activeEvents.luckBonus = 0.5; },
+                cleanup: () => { delete gameState.activeEvents.luckBonus; }
+            },
+            blockRain: {
+                name: "🌧️ BLOCK RAIN!",
+                description: "20 random lucky blocks fall from the sky!",
+                duration: 0,
+                effect: () => {
+                    for (let i = 0; i < 20; i++) {
+                        setTimeout(() => {
+                            const rarity = getLuckyBlockRarity();
+                            const block = {
+                                id: Date.now() + Math.random(),
+                                rarity: rarity,
+                                moneyPerSecond: getRandomInRange(rarities[rarity].moneyPerSecond[0], rarities[rarity].moneyPerSecond[1]) * gameState.multiplier,
+                                emoji: rarities[rarity].emoji
+                            };
+                            gameState.luckyBlocks.push(block);
+                            renderLuckyBlocks();
+                            updateMoneyPerSecond();
+                        }, i * 200);
+                    }
+                },
+                cleanup: () => {}
+            },
+            megaMultiplier: {
+                name: "⚡ MEGA MULTIPLIER!",
+                description: "Your clicks are worth 10x more money!",
+                duration: 45000,
+                effect: () => { gameState.activeEvents.clickMultiplier = 10; },
+                cleanup: () => { delete gameState.activeEvents.clickMultiplier; }
+            },
+            instantRebirth: {
+                name: "🔄 FREE REBIRTH!",
+                description: "You get a free rebirth with no cost!",
+                duration: 0,
+                effect: () => {
+                    gameState.rebirths++;
+                    gameState.multiplier *= 2;
+                    gameState.clicksNeeded = Math.max(1, gameState.clicksNeeded - 1);
+                    gameState.clicks = 0;
+                    
+                    const keepPercentage = Math.min(0.5, gameState.rebirths * 0.1);
+                    const blocksToKeep = Math.floor(gameState.luckyBlocks.length * keepPercentage);
+                    gameState.luckyBlocks = gameState.luckyBlocks
+                        .sort((a, b) => b.moneyPerSecond - a.moneyPerSecond)
+                        .slice(0, blocksToKeep);
+                    
+                    renderLuckyBlocks();
+                    updateMoneyPerSecond();
+                    updateDisplay();
+                    updateProgress();
+                    updateRebirthButton();
+                },
+                cleanup: () => {}
+            },
+            shopSale: {
+                name: "🛒 SHOP SALE!",
+                description: "All upgrades are 50% off for 2 minutes!",
+                duration: 120000,
+                effect: () => { gameState.activeEvents.shopDiscount = 0.5; },
+                cleanup: () => { delete gameState.activeEvents.shopDiscount; }
+            }
+        };
+
+        // Lucky block rarities and their properties
+        const rarities = {
+            common: { 
+                chance: 0.6, 
+                moneyPerSecond: [1, 3], 
+                emoji: '📦', 
+                name: 'Common',
+                color: 'common'
+            },
+            rare: { 
+                chance: 0.25, 
+                moneyPerSecond: [4, 8], 
+                emoji: '💎', 
+                name: 'Rare',
+                color: 'rare'
+            },
+            epic: { 
+                chance: 0.12, 
+                moneyPerSecond: [9, 15], 
+                emoji: '🔮', 
+                name: 'Epic',
+                color: 'epic'
+            },
+            legendary: { 
+                chance: 0.03, 
+                moneyPerSecond: [16, 30], 
+                emoji: '👑', 
+                name: 'Legendary',
+                color: 'legendary'
+            },
+            mythic: { 
+                chance: 0.008, 
+                moneyPerSecond: [31, 60], 
+                emoji: '⭐', 
+                name: 'Mythic',
+                color: 'mythic'
+            },
+            godly: { 
+                chance: 0.002, 
+                moneyPerSecond: [61, 120], 
+                emoji: '🌈', 
+                name: 'Godly',
+                color: 'godly'
+            },
+            glorious: { 
+                chance: 0.0005, 
+                moneyPerSecond: [121, 250], 
+                emoji: '⚡', 
+                name: 'Glorious',
+                color: 'glorious'
+            }
+        };
+
+        // Shop upgrades
+        const shopUpgrades = {
+            clickMultiplier: {
+                name: "Click Power",
+                description: "Increases money per click",
+                basePrice: 100,
+                effect: "2x click value",
+                maxLevel: 10
+            },
+            autoClicker: {
+                name: "Auto Clicker",
+                description: "Automatically clicks for you",
+                basePrice: 500,
+                effect: "1 click per 2 seconds",
+                maxLevel: 5
+            },
+            luckBoost: {
+                name: "Luck Enhancer",
+                description: "Better chance for rare blocks",
+                basePrice: 1000,
+                effect: "+5% better luck",
+                maxLevel: 20
+            },
+            mythicUnlock: {
+                name: "Mythic Unlock",
+                description: "Unlock Mythic rarity blocks",
+                basePrice: 5000,
+                effect: "Unlock ⭐ Mythic blocks",
+                maxLevel: 1
+            },
+            godlyUnlock: {
+                name: "Godly Unlock",
+                description: "Unlock Godly rarity blocks",
+                basePrice: 25000,
+                effect: "Unlock 🌈 Godly blocks",
+                maxLevel: 1
+            },
+            gloriousUnlock: {
+                name: "Glorious Unlock",
+                description: "Unlock Glorious rarity blocks",
+                basePrice: 100000,
+                effect: "Unlock ⚡ Glorious blocks",
+                maxLevel: 1
+            },
+            blockCapacity: {
+                name: "Block Storage",
+                description: "Hold more lucky blocks",
+                basePrice: 2000,
+                effect: "+5 block capacity",
+                maxLevel: 10
+            }
+        };
+
+        // Initialize game
+        function init() {
+            updateDisplay();
+            setInterval(generatePassiveIncome, 1000);
+            setInterval(autoClick, 2000);
+            setInterval(checkRandomEvents, 30000); // Check for random events every 30 seconds
+            loadGame();
+            renderShop();
+        }
+
+        // Random event system - automatically trigger events
+        function checkRandomEvents() {
+            // Only trigger events if player has some progress
+            if (gameState.money > 100 && Math.random() < 0.1) { // 10% chance every 30 seconds
+                const eventTypes = Object.keys(randomEvents);
+                const randomEventType = eventTypes[Math.floor(Math.random() * eventTypes.length)];
+                triggerRandomEvent(randomEventType);
+            }
+        }
+
+        // Handle click
+        function handleClick() {
+            gameState.clicks++;
+            
+            // Add money from click multiplier with event bonuses
+            let clickValue = (gameState.upgrades.clickMultiplier || 0) * 10;
+            if (gameState.activeEvents.clickMultiplier) {
+                clickValue *= gameState.activeEvents.clickMultiplier;
+            }
+            if (clickValue > 0) {
+                gameState.money += clickValue;
+            }
+            
+            updateProgress();
+            
+            if (gameState.clicks >= gameState.clicksNeeded) {
+                createLuckyBlock();
+                gameState.clicks = 0;
+                updateProgress();
+            }
+            
+            updateDisplay();
+            saveGame();
+        }
+
+        // Create lucky block
+        function createLuckyBlock() {
+            const rarity = getLuckyBlockRarity();
+            const block = {
+                id: Date.now(),
+                rarity: rarity,
+                moneyPerSecond: getRandomInRange(rarities[rarity].moneyPerSecond[0], rarities[rarity].moneyPerSecond[1]) * gameState.multiplier,
+                emoji: rarities[rarity].emoji
+            };
+            
+            gameState.luckyBlocks.push(block);
+            renderLuckyBlocks();
+            showNotification(`Got ${rarities[rarity].name} block! +$${block.moneyPerSecond}/s`, 'block');
+            updateMoneyPerSecond();
+        }
+
+        // Get lucky block rarity based on chances and rebirth bonuses
+        function getLuckyBlockRarity() {
+            let luckBonus = gameState.rebirths * 0.02 + (gameState.upgrades.luckBoost || 0) * 0.05;
+            if (gameState.activeEvents.luckBonus) {
+                luckBonus += gameState.activeEvents.luckBonus;
+            }
+            const random = Math.random() - luckBonus;
+            
+            // Check unlocked rarities
+            if (gameState.upgrades.gloriousUnlock && random < rarities.glorious.chance) return 'glorious';
+            if (gameState.upgrades.godlyUnlock && random < rarities.glorious.chance + rarities.godly.chance) return 'godly';
+            if (gameState.upgrades.mythicUnlock && random < rarities.glorious.chance + rarities.godly.chance + rarities.mythic.chance) return 'mythic';
+            if (random < rarities.glorious.chance + rarities.godly.chance + rarities.mythic.chance + rarities.legendary.chance) return 'legendary';
+            if (random < rarities.glorious.chance + rarities.godly.chance + rarities.mythic.chance + rarities.legendary.chance + rarities.epic.chance) return 'epic';
+            if (random < rarities.glorious.chance + rarities.godly.chance + rarities.mythic.chance + rarities.legendary.chance + rarities.epic.chance + rarities.rare.chance) return 'rare';
+            return 'common';
+        }
+
+        // Open lucky block
+        function openLuckyBlock(blockId) {
+            const blockIndex = gameState.luckyBlocks.findIndex(block => block.id === blockId);
+            if (blockIndex === -1) return;
+            
+            const block = gameState.luckyBlocks[blockIndex];
+            gameState.luckyBlocks.splice(blockIndex, 1);
+            
+            renderLuckyBlocks();
+            updateMoneyPerSecond();
+            showNotification(`Opened ${rarities[block.rarity].name} block!`, 'block');
+            saveGame();
+        }
+
+        // Render lucky blocks
+        function renderLuckyBlocks() {
+            const container = document.getElementById('luckyBlocks');
+            container.innerHTML = '';
+            
+            gameState.luckyBlocks.forEach(block => {
+                const blockElement = document.createElement('button');
+                blockElement.className = `lucky-block ${rarities[block.rarity].color}`;
+                blockElement.innerHTML = block.emoji;
+                blockElement.title = `${rarities[block.rarity].name} Block\n+$${block.moneyPerSecond}/s`;
+                blockElement.onclick = () => openLuckyBlock(block.id);
+                container.appendChild(blockElement);
+            });
+        }
+
+        // Generate passive income
+        function generatePassiveIncome() {
+            if (gameState.moneyPerSecond > 0) {
+                let income = gameState.moneyPerSecond;
+                if (gameState.activeEvents.goldRushMultiplier) {
+                    income *= gameState.activeEvents.goldRushMultiplier;
+                }
+                gameState.money += income;
+                updateDisplay();
+                saveGame();
+            }
+        }
+
+        // Update money per second
+        function updateMoneyPerSecond() {
+            gameState.moneyPerSecond = gameState.luckyBlocks.reduce((total, block) => total + block.moneyPerSecond, 0);
+            updateDisplay();
+        }
+
+        // Rebirth system
+        function rebirth() {
+            const cost = 1000 * Math.pow(2, gameState.rebirths);
+            
+            if (gameState.money >= cost) {
+                gameState.money -= cost;
+                gameState.rebirths++;
+                gameState.multiplier *= 2;
+                gameState.clicksNeeded = Math.max(1, gameState.clicksNeeded - 1);
+                gameState.clicks = 0;
+                
+                // Keep some lucky blocks based on rebirth level
+                const keepPercentage = Math.min(0.5, gameState.rebirths * 0.1);
+                const blocksToKeep = Math.floor(gameState.luckyBlocks.length * keepPercentage);
+                gameState.luckyBlocks = gameState.luckyBlocks
+                    .sort((a, b) => b.moneyPerSecond - a.moneyPerSecond)
+                    .slice(0, blocksToKeep);
+                
+                renderLuckyBlocks();
+                updateMoneyPerSecond();
+                updateDisplay();
+                updateProgress();
+                updateRebirthButton();
+                
+                showNotification(`Rebirth complete! 2x multiplier, better luck!`, 'rebirth');
+                saveGame();
+            }
+        }
+
+        // Update rebirth button
+        function updateRebirthButton() {
+            const cost = 1000 * Math.pow(2, gameState.rebirths);
+            const btn = document.getElementById('rebirthBtn');
+            btn.textContent = `🔄 Rebirth ($${cost.toLocaleString()})`;
+            btn.disabled = gameState.money < cost;
+            btn.style.opacity = gameState.money >= cost ? '1' : '0.5';
+        }
+
+        // Update progress bar
+        function updateProgress() {
+            const progress = (gameState.clicks / gameState.clicksNeeded) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('clickProgress').textContent = gameState.clicks;
+            document.getElementById('clicksNeeded').textContent = gameState.clicksNeeded;
+        }
+
+        // Update display
+        function updateDisplay() {
+            document.getElementById('money').textContent = '$' + Math.floor(gameState.money).toLocaleString();
+            document.getElementById('moneyPerSecond').textContent = '$' + gameState.moneyPerSecond.toLocaleString() + '/s';
+            document.getElementById('rebirths').textContent = gameState.rebirths.toLocaleString();
+            document.getElementById('multiplier').textContent = gameState.multiplier + 'x';
+            updateRebirthButton();
+        }
+
+        // Theme system
+        function changeTheme(theme) {
+            gameState.theme = theme;
+            document.body.className = `theme-${theme}`;
+            
+            // Update active theme button
+            document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`.theme-btn.${theme}`).classList.add('active');
+            
+            saveGame();
+        }
+
+        // Settings modal
+        function openSettings() {
+            document.getElementById('settingsModal').style.display = 'flex';
+        }
+
+        function closeSettings() {
+            document.getElementById('settingsModal').style.display = 'none';
+        }
+
+        // Notifications
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Utility functions
+        function getRandomInRange(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        // Save/Load game
+        function saveGame() {
+            localStorage.setItem('luckyBlockClicker', JSON.stringify(gameState));
+        }
+
+        function loadGame() {
+            const saved = localStorage.getItem('luckyBlockClicker');
+            if (saved) {
+                gameState = { ...gameState, ...JSON.parse(saved) };
+                changeTheme(gameState.theme);
+                renderLuckyBlocks();
+                updateMoneyPerSecond();
+                updateDisplay();
+                updateProgress();
+            }
+        }
+
+        // Auto clicker function
+        function autoClick() {
+            const autoClickerLevel = gameState.upgrades.autoClicker || 0;
+            if (autoClickerLevel > 0) {
+                for (let i = 0; i < autoClickerLevel; i++) {
+                    handleClick();
+                }
+            }
+        }
+
+        // Shop functions
+        function openShop() {
+            document.getElementById('shopModal').style.display = 'flex';
+            renderShop();
+        }
+
+        function closeShop() {
+            document.getElementById('shopModal').style.display = 'none';
+        }
+
+        function renderShop() {
+            const shopGrid = document.getElementById('shopGrid');
+            shopGrid.innerHTML = '';
+
+            Object.keys(shopUpgrades).forEach(upgradeId => {
+                const upgrade = shopUpgrades[upgradeId];
+                const currentLevel = gameState.upgrades[upgradeId] || 0;
+                let price = Math.floor(upgrade.basePrice * Math.pow(1.5, currentLevel));
+                
+                // Apply shop sale discount
+                if (gameState.activeEvents.shopDiscount) {
+                    price = Math.floor(price * (1 - gameState.activeEvents.shopDiscount));
+                }
+                
+                const maxed = currentLevel >= upgrade.maxLevel;
+                const saleText = gameState.activeEvents.shopDiscount ? ' 🔥SALE!' : '';
+
+                const shopItem = document.createElement('div');
+                shopItem.className = `shop-item ${maxed ? 'purchased' : ''}`;
+                shopItem.innerHTML = `
+                    <h3>${upgrade.name}${saleText}</h3>
+                    <p>${upgrade.description}</p>
+                    <div class="shop-price">${maxed ? 'MAXED' : '$' + price.toLocaleString()}</div>
+                    <p>Level: ${currentLevel}/${upgrade.maxLevel}</p>
+                    <p>${upgrade.effect}</p>
+                    ${!maxed ? `<button class="btn" onclick="buyUpgrade('${upgradeId}')" ${gameState.money < price ? 'disabled' : ''}>Buy</button>` : ''}
+                `;
+                shopGrid.appendChild(shopItem);
+            });
+        }
+
+        function buyUpgrade(upgradeId) {
+            const upgrade = shopUpgrades[upgradeId];
+            const currentLevel = gameState.upgrades[upgradeId] || 0;
+            let price = Math.floor(upgrade.basePrice * Math.pow(1.5, currentLevel));
+            
+            // Apply shop sale discount
+            if (gameState.activeEvents.shopDiscount) {
+                price = Math.floor(price * (1 - gameState.activeEvents.shopDiscount));
+            }
+
+            if (gameState.money >= price && currentLevel < upgrade.maxLevel) {
+                gameState.money -= price;
+                gameState.upgrades[upgradeId] = currentLevel + 1;
+                
+                showNotification(`Purchased ${upgrade.name}!`, 'money');
+                renderShop();
+                updateDisplay();
+                saveGame();
+            }
+        }
+
+        // Admin functions
+        function toggleAdmin() {
+            const adminPanel = document.getElementById('adminPanel');
+            if (adminPanel.style.display === 'none' || adminPanel.style.display === '') {
+                adminPanel.style.display = 'block';
+                showNotification('Admin panel activated!', 'rebirth');
+            } else {
+                adminPanel.style.display = 'none';
+            }
+        }
+
+        function adminAddMoney() {
+            gameState.money += 10000;
+            updateDisplay();
+            showNotification('Added $10,000!', 'money');
+            saveGame();
+        }
+
+        function adminAddCustomMoney() {
+            const amount = parseInt(document.getElementById('customMoneyInput').value);
+            if (amount && amount > 0) {
+                gameState.money += amount;
+                updateDisplay();
+                showNotification(`Added $${amount.toLocaleString()}!`, 'money');
+                document.getElementById('customMoneyInput').value = '';
+                saveGame();
+            }
+        }
+
+        function adminSetMoney() {
+            const amount = parseInt(document.getElementById('customMoneyInput').value);
+            if (amount >= 0) {
+                gameState.money = amount;
+                updateDisplay();
+                showNotification(`Set money to $${amount.toLocaleString()}!`, 'money');
+                document.getElementById('customMoneyInput').value = '';
+                saveGame();
+            }
+        }
+
+        function adminAddCustomBlocks() {
+            const rarity = document.getElementById('blockRaritySelect').value;
+            const amount = parseInt(document.getElementById('blockAmountInput').value) || 1;
+            
+            for (let i = 0; i < Math.min(amount, 50); i++) {
+                const block = {
+                    id: Date.now() + Math.random(),
+                    rarity: rarity,
+                    moneyPerSecond: getRandomInRange(rarities[rarity].moneyPerSecond[0], rarities[rarity].moneyPerSecond[1]) * gameState.multiplier,
+                    emoji: rarities[rarity].emoji
+                };
+                gameState.luckyBlocks.push(block);
+            }
+            renderLuckyBlocks();
+            updateMoneyPerSecond();
+            showNotification(`Added ${amount} ${rarities[rarity].name} blocks!`, 'block');
+            saveGame();
+        }
+
+        function adminTriggerEvent() {
+            const eventType = document.getElementById('eventSelect').value;
+            const event = randomEvents[eventType];
+            
+            if (event) {
+                triggerRandomEvent(eventType);
+            }
+        }
+
+        function triggerRandomEvent(eventType) {
+            const event = randomEvents[eventType];
+            if (!event) return;
+
+            // Show event notification
+            showEventNotification(event.name, event.description);
+            
+            // Apply event effect
+            event.effect();
+            
+            // Set cleanup timer if event has duration
+            if (event.duration > 0) {
+                setTimeout(() => {
+                    event.cleanup();
+                    showNotification(`${event.name} ended!`, 'rebirth');
+                    renderShop(); // Update shop in case it was a sale
+                    saveGame();
+                }, event.duration);
+            }
+            
+            renderShop(); // Update shop immediately in case it's a sale
+            saveGame();
+        }
+
+        function showEventNotification(title, description) {
+            const eventNotif = document.getElementById('eventNotification');
+            eventNotif.innerHTML = `
+                <div style="font-size: 2rem; margin-bottom: 10px;">${title}</div>
+                <div style="font-size: 1rem; opacity: 0.9;">${description}</div>
+            `;
+            eventNotif.style.display = 'block';
+            
+            setTimeout(() => {
+                eventNotif.style.display = 'none';
+            }, 4000);
+        }
+
+        function adminMaxUpgrades() {
+            Object.keys(shopUpgrades).forEach(upgradeId => {
+                gameState.upgrades[upgradeId] = shopUpgrades[upgradeId].maxLevel;
+            });
+            renderShop();
+            showNotification('All upgrades maxed!', 'money');
+            saveGame();
+        }
+
+        function adminResetGame() {
+            if (confirm('Are you sure you want to reset the game?')) {
+                localStorage.removeItem('luckyBlockClicker');
+                location.reload();
+            }
+        }
+
+        function adminUnlockAll() {
+            gameState.upgrades.mythicUnlock = 1;
+            gameState.upgrades.godlyUnlock = 1;
+            gameState.upgrades.gloriousUnlock = 1;
+            renderShop();
+            showNotification('All rarities unlocked!', 'block');
+            saveGame();
+        }
+
+        function closeAdmin() {
+            document.getElementById('adminPanel').style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const settingsModal = document.getElementById('settingsModal');
+            const shopModal = document.getElementById('shopModal');
+            if (event.target === settingsModal) {
+                closeSettings();
+            }
+            if (event.target === shopModal) {
+                closeShop();
+            }
+        }
+
+        // Initialize game when page loads
+        init();
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98b1c0fd43b42518',t:'MTc1OTg4NTc3Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
